@@ -32,19 +32,17 @@ class PostSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class FollowerSerializer(serializers.HyperlinkedModelSerializer):
-    user = UserSerializer(read_only=True)
 
     class Meta:
         model = models.Profile
-        fields = ['user']
+        fields = ('url', 'pic', 'get_username')
 
 
 class FollowingSerializer(serializers.HyperlinkedModelSerializer):
-    user = UserSerializer(read_only=True)
 
     class Meta:
         model = models.Profile
-        fields = ['user']
+        fields = ['url', 'pic', 'get_username']
 
 
 class ProfileSerializer(serializers.HyperlinkedModelSerializer):
@@ -55,5 +53,5 @@ class ProfileSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = models.Profile
-        fields = ['user', 'bio', 'is_private', 'pic', 'get_followers',
+        fields = ['url', 'user', 'bio', 'is_private', 'pic', 'get_followers',
                   'get_following', 'posts']

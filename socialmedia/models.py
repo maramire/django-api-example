@@ -21,6 +21,9 @@ class Profile(models.Model):
     def get_following(self):
         return self.following.all()
 
+    def get_username(self):
+        return self.user.username
+
 
 class Post(models.Model):
     caption = models.CharField(max_length=140, blank=True)
