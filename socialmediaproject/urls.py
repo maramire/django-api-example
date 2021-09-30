@@ -8,7 +8,7 @@ from django.contrib import admin
 router = routers.DefaultRouter()
 router.register(r'users', views.UserViewSet)
 router.register(r'groups', views.GroupViewSet)
-router.register(r'profiles', views.ProfileViewSet)
+router.register(r'profiles', views.ProfileViewSet, basename="profile")
 router.register(r'comments', views.CommentViewSet)
 router.register(r'posts', views.PostViewSet)
 
