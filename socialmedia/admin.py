@@ -13,6 +13,7 @@ class ProfileInline(admin.StackedInline):
     model = models.Profile
     can_delete = False
     verbose_name_plural = 'profile'
+    exclude = ('following',)
 
 # Define a new User admin
 
