@@ -9,13 +9,17 @@ class Profile(models.Model):
     bio = models.CharField(max_length=140, blank=True)
     is_private = models.BooleanField(default=False)
     pic = models.ImageField(upload_to="images/profiles/", null=True)
-    followers = models.ManyToManyField(
-        "self", blank=True, symmetrical=False, related_name='followed_by')  # relationships are in one direction, asymmetrical (instagram is asymmetrical)
     following = models.ManyToManyField(
-        "self", blank=True, symmetrical=False, related_name='following_to')
+        'self', symmetrical=False, related_name="followers", blank=True)
 
     def __str__(self) -> str:
         return self.user.username
+
+    def get_followers(self):
+        return self.followers.all()
+
+    def get_following(self):
+        return self.following.all()
 
 
 class Post(models.Model):

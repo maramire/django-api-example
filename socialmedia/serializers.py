@@ -31,15 +31,29 @@ class PostSerializer(serializers.HyperlinkedModelSerializer):
         fields = ['caption', 'date', 'image', 'profile', 'comments']
 
 
-class ProfileSerializer(serializers.HyperlinkedModelSerializer):
-    followers = serializers.HyperlinkedRelatedField(
-        many=True, read_only=True, view_name='profile-detail')
-    following = serializers.HyperlinkedRelatedField(
-        many=True, read_only=True, view_name='profile-detail')
-    posts = PostSerializer(many=True, read_only=True)
+class FollowerSerializer(serializers.HyperlinkedModelSerializer):
     user = UserSerializer(read_only=True)
 
     class Meta:
         model = models.Profile
-        fields = ['user', 'bio',
-                  'is_private', 'pic', 'followers', 'following', 'posts']
+        fields = ['user']
+
+
+class FollowingSerializer(serializers.HyperlinkedModelSerializer):
+    user = UserSerializer(read_only=True)
+
+    class Meta:
+        model = models.Profile
+        fields = ['user']
+
+
+class ProfileSerializer(serializers.HyperlinkedModelSerializer):
+    posts = PostSerializer(many=True, read_only=True)
+    user = UserSerializer(read_only=True)
+    get_followers = FollowerSerializer(many=True, read_only=True)
+    get_following = FollowingSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = models.Profile
+        fields = ['user', 'bio', 'is_private', 'pic', 'get_followers',
+                  'get_following', 'posts']
