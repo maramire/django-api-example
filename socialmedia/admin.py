@@ -5,8 +5,8 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
 # Register your models here.
 
-# Define an inline admin descriptor for Employee model
-# which acts a bit like a singleton
+# Here we define an 'inline' profile form
+# that will be attached to user form
 
 
 class ProfileInline(admin.StackedInline):
@@ -15,7 +15,7 @@ class ProfileInline(admin.StackedInline):
     verbose_name_plural = 'profile'
     exclude = ('following',)
 
-# Define a new User admin
+# Here we explicity attach the profile inline form
 
 
 class UserAdmin(BaseUserAdmin):

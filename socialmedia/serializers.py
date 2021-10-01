@@ -58,20 +58,20 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
         fields = ['url', 'username', 'first_name', 'last_name',
                   'email', 'groups', 'profile']
 
+    # Define the way how a user can be created with a profile object
     def create(self, validated_data):
         profile_data = validated_data.pop('profile')
         groups_data = validated_data.pop('groups')
-        print(validated_data)
         user = User(**validated_data)
         user.save()
-
         for group in groups_data:
             user.groups.add(group)
-
         models.Profile.objects.create(user=user, **profile_data)
         return user
 
+    # Define the way how the user can be updated with profile object
     def update(self, instance, validated_data):
+        # update user fields
         instance.username = validated_data.get('username', instance.username)
         instance.email = validated_data.get('email', instance.email)
         instance.first_name = validated_data.get(
@@ -79,14 +79,13 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
         instance.last_name = validated_data.get(
             'last_name', instance.last_name)
         instance.save()
-
         groups_data = validated_data.pop('groups')
         for group in groups_data:
             instance.groups.add(group)
-
+        # update profile fields
         if (not instance.is_staff):
-            profile = instance.profile
-            profile_data = validated_data.pop('profile')
+            profile = instance.profile  # the actual profile
+            profile_data = validated_data.pop('profile')  # the updated profile
             profile.bio = profile_data.get('email', profile.bio)
             profile.is_private = profile_data.get(
                 'is_private', profile.is_private)

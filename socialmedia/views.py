@@ -30,10 +30,11 @@ class PostViewSet(viewsets.ModelViewSet):
 
 
 class ProfileViewSet(viewsets.ModelViewSet):
-
     serializer_class = ProfileSerializer
     permission_classes = [permissions.IsAuthenticated]
 
+    # manually define the queryset for the viewset
+    # 'basename' on router is needed
     def get_queryset(self):
         if(self.request.user.is_staff):
             return models.Profile.objects.all()
