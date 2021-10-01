@@ -35,4 +35,7 @@ class ProfileViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        return models.Profile.objects.all().exclude(id=self.request.user.profile.id)
+        if(self.request.user.is_staff):
+            return models.Profile.objects.all()
+        else:
+            return models.Profile.objects.all().exclude(id=self.request.user.profile.id)
