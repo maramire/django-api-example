@@ -27,11 +27,15 @@ class FollowingSerializer(serializers.HyperlinkedModelSerializer):
 class ProfileSerializer(serializers.HyperlinkedModelSerializer):
     posts = serializers.HyperlinkedIdentityField(
         read_only=True, view_name="profile-posts")
+    followers = serializers.HyperlinkedIdentityField(
+        read_only=True, view_name="profile-followers")
+    following = serializers.HyperlinkedIdentityField(
+        read_only=True, view_name="profile-following")
 
     class Meta:
         model = models.Profile
         fields = ['url', 'bio', 'is_private', 'pic', 'get_followers_count',
-                  'get_following_count', 'posts']
+                  'get_following_count', 'posts', 'followers', 'following']
 
 
 class ProfilePostSerializer(serializers.HyperlinkedModelSerializer):

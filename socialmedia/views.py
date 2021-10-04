@@ -2,7 +2,7 @@ from django.contrib.auth.models import User, Group
 from rest_framework import viewsets
 from rest_framework import permissions
 from rest_framework.generics import get_object_or_404
-from socialmedia.serializers import ProfilePostSerializer, UserSerializer, GroupSerializer, CommentSerializer, PostSerializer, ProfileSerializer
+from socialmedia.serializers import FollowerSerializer, ProfilePostSerializer, UserSerializer, GroupSerializer, CommentSerializer, PostSerializer, ProfileSerializer
 from . import models
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -58,6 +58,22 @@ class ProfileViewSet(viewsets.ModelViewSet):
         posts = models.Post.objects.filter(profile_id=pk)
         serializer = PostSerializer(
             posts, many=True, context={'request': request})
+        return Response(serializer.data)
+
+    # an action when profile/:id/followers is requested
+    @action(methods=['get'], detail=True)
+    def followers(self, request, pk=None):
+        profile = get_object_or_404(models.Profile, pk=pk)
+        serializer = FollowerSerializer(
+            profile.get_followers(), many=True, context={'request': request})
+        return Response(serializer.data)
+
+    # an action when profile/:id/following is requested
+    @action(methods=['get'], detail=True)
+    def following(self, request, pk=None):
+        profile = get_object_or_404(models.Profile, pk=pk)
+        serializer = FollowerSerializer(
+            profile.get_following(), many=True, context={'request': request})
         return Response(serializer.data)
 
 
