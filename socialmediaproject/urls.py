@@ -11,6 +11,7 @@ router.register(r'groups', views.GroupViewSet)
 router.register(r'profiles', views.ProfileViewSet, basename="profile")
 router.register(r'comments', views.CommentViewSet)
 router.register(r'posts', views.PostViewSet)
+router.register(r'feed', views.FeedViewSet, basename="feed")
 
 # Wire up our API using automatic URL routing.
 # Additionally, we include login URLs for the browsable API.

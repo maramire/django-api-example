@@ -93,3 +93,8 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
             profile.save()
 
         return instance
+
+
+class FeedSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = models.Post

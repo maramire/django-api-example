@@ -40,3 +40,18 @@ class ProfileViewSet(viewsets.ModelViewSet):
             return models.Profile.objects.all()
         else:
             return models.Profile.objects.all().exclude(id=self.request.user.profile.id)
+
+
+class FeedViewSet(viewsets.ModelViewSet):
+    serializer_class = PostSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        if(user.is_staff):
+            models.Post.objects.all()
+        else:
+            # make a queryset of only ids of people following
+            following = user.profile.following.all().values_list('id', flat=True)
+            # return the posts of people that user follows
+            return models.Post.objects.filter(profile_id__in=following)
