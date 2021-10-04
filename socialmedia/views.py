@@ -76,6 +76,36 @@ class ProfileViewSet(viewsets.ModelViewSet):
             profile.get_following(), many=True, context={'request': request})
         return Response(serializer.data)
 
+    # an action when profile/:id/follow is requested
+    # 'request.user' is the user who follows
+    # 'pk' is the id of the user that is followed
+    @action(methods=['get'], detail=True)
+    def follow(self, request, pk=None):
+        my_following = request.user.profile.get_following()
+        # check if user is already followed
+        if my_following.filter(id__exact=int(pk)).exists():
+            return Response({"message": "The profile is already being followed."})
+        else:
+            my_profile = request.user.profile
+            following_profile = models.Profile.objects.get(id=int(pk))
+            my_profile.following.add(following_profile)
+            return Response({"message": f'Now you are following {following_profile.user.username}'})
+
+    # an action when profile/:id/unfollow is requested
+    # 'request.user' is the user who unfollows
+    # 'pk' is the id of the user to unfollow
+    @action(methods=['get'], detail=True)
+    def unfollow(self, request, pk=None):
+        my_following = request.user.profile.get_following()
+        # check if user is already followed
+        if my_following.filter(id__exact=int(pk)).exists():
+            my_profile = request.user.profile
+            following_profile = models.Profile.objects.get(id=int(pk))
+            my_profile.following.remove(following_profile)
+            return Response({"message": f"The profile {following_profile.user.username} has been unfollowed"})
+        else:
+            return Response({"message": "This profile can't be unfollowed because you're not following it"})
+
 
 class FeedViewSet(viewsets.ModelViewSet):
     serializer_class = PostSerializer
