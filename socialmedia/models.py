@@ -24,6 +24,12 @@ class Profile(models.Model):
     def get_username(self):
         return self.user.username
 
+    def get_followers_count(self):
+        return self.followers.count()
+
+    def get_following_count(self):
+        return self.following.count()
+
 
 class Post(models.Model):
     caption = models.CharField(max_length=140, blank=True)

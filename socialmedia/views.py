@@ -1,8 +1,11 @@
 from django.contrib.auth.models import User, Group
 from rest_framework import viewsets
 from rest_framework import permissions
-from socialmedia.serializers import UserSerializer, GroupSerializer, CommentSerializer, PostSerializer, ProfileSerializer
+from rest_framework.generics import get_object_or_404
+from socialmedia.serializers import ProfilePostSerializer, UserSerializer, GroupSerializer, CommentSerializer, PostSerializer, ProfileSerializer
 from . import models
+from rest_framework.decorators import action
+from rest_framework.response import Response
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -28,6 +31,14 @@ class PostViewSet(viewsets.ModelViewSet):
     serializer_class = PostSerializer
     permission_classes = [permissions.IsAuthenticated]
 
+    # an action when posts/:id/comments is requested
+    @action(methods=['get'], detail=True)
+    def comments(self, request, pk=None):
+        comments = models.Comment.objects.filter(post_id=pk)
+        serializer = CommentSerializer(
+            comments, many=True, context={'request': request})
+        return Response(serializer.data)
+
 
 class ProfileViewSet(viewsets.ModelViewSet):
     serializer_class = ProfileSerializer
@@ -40,6 +51,14 @@ class ProfileViewSet(viewsets.ModelViewSet):
             return models.Profile.objects.all()
         else:
             return models.Profile.objects.all().exclude(id=self.request.user.profile.id)
+
+    # an action when profile/:id/posts is requested
+    @action(methods=['get'], detail=True)
+    def posts(self, request, pk=None):
+        posts = models.Post.objects.filter(profile_id=pk)
+        serializer = PostSerializer(
+            posts, many=True, context={'request': request})
+        return Response(serializer.data)
 
 
 class FeedViewSet(viewsets.ModelViewSet):

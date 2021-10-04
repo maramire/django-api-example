@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User, Group
+from django.db.models.fields import CharField
 from rest_framework import serializers
 from . import models
 
@@ -7,22 +8,6 @@ class GroupSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Group
         fields = ['url', 'name']
-
-
-class CommentSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = models.Comment
-        fields = ['profile', 'text', 'date']
-
-
-class PostSerializer(serializers.HyperlinkedModelSerializer):
-    profile = serializers.HyperlinkedRelatedField(
-        read_only=True, view_name='profile-detail')
-    comments = CommentSerializer(many=True, read_only=True)
-
-    class Meta:
-        model = models.Post
-        fields = ['caption', 'date', 'image', 'profile', 'comments']
 
 
 class FollowerSerializer(serializers.HyperlinkedModelSerializer):
@@ -40,14 +25,40 @@ class FollowingSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class ProfileSerializer(serializers.HyperlinkedModelSerializer):
-    posts = PostSerializer(many=True, read_only=True)
-    get_followers = FollowerSerializer(many=True, read_only=True)
-    get_following = FollowingSerializer(many=True, read_only=True)
+    class Meta:
+        model = models.Profile
+        fields = ['url', 'bio', 'is_private', 'pic', 'get_followers_count',
+                  'get_following_count']
+
+
+class ProfilePostSerializer(serializers.HyperlinkedModelSerializer):
+    username = serializers.SerializerMethodField()
+
+    def get_username(self, obj):
+        return obj.user.username
 
     class Meta:
         model = models.Profile
-        fields = ['url', 'bio', 'is_private', 'pic', 'get_followers',
-                  'get_following', 'posts']
+        fields = ['url', 'pic', 'username']
+
+
+class CommentSerializer(serializers.HyperlinkedModelSerializer):
+    profile = ProfilePostSerializer()
+
+    class Meta:
+        model = models.Comment
+        fields = ['profile', 'text', 'date']
+
+
+class PostSerializer(serializers.HyperlinkedModelSerializer):
+    profile = ProfilePostSerializer()
+    # add the action resource as url
+    comments = serializers.HyperlinkedIdentityField(
+        read_only=True, view_name="post-comments")
+
+    class Meta:
+        model = models.Post
+        fields = ['url', 'caption', 'date', 'image', 'profile', 'comments']
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
