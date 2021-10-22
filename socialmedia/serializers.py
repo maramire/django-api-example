@@ -31,10 +31,14 @@ class ProfileSerializer(serializers.HyperlinkedModelSerializer):
         read_only=True, view_name="profile-followers")
     following = serializers.HyperlinkedIdentityField(
         read_only=True, view_name="profile-following")
+    username = serializers.SerializerMethodField()
+
+    def get_username(self, obj):
+        return obj.user.username
 
     class Meta:
         model = models.Profile
-        fields = ['url', 'bio', 'is_private', 'pic', 'get_followers_count',
+        fields = ['url', 'username', 'bio', 'is_private', 'pic', 'get_followers_count',
                   'get_following_count', 'posts', 'followers', 'following']
 
 
