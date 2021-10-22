@@ -6,6 +6,7 @@ from socialmedia.serializers import FollowerSerializer, ProfilePostSerializer, U
 from . import models
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from django.db.models import Q
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -31,10 +32,19 @@ class PostViewSet(viewsets.ModelViewSet):
     serializer_class = PostSerializer
     permission_classes = [permissions.IsAuthenticated]
 
+    # public posts or followed users posts
+    def get_queryset(self):
+        user = self.request.user
+        # make a queryset of only ids of people following
+        following = user.profile.following.all().values_list('id', flat=True)
+        # return the public posts or posts from people that follows
+        return models.Post.objects.filter((Q(profile__is_private=False) | Q(profile_id__in=following)))
+
     # an action when posts/:id/comments is requested
     @action(methods=['get'], detail=True)
     def comments(self, request, pk=None):
-        comments = models.Comment.objects.filter(post_id=pk)
+        post = get_object_or_404(self.get_queryset(), pk=pk)
+        comments = models.Comment.objects.filter(post_id=post.id)
         serializer = CommentSerializer(
             comments, many=True, context={'request': request})
         return Response(serializer.data)
