@@ -22,7 +22,7 @@ class GroupViewSet(viewsets.ModelViewSet):
 
 class CommentViewSet(viewsets.ModelViewSet):
     queryset = models.Comment.objects.all()
-    serializer_class = GroupSerializer
+    serializer_class = CommentSerializer
     permission_classes = [permissions.IsAuthenticated]
 
 
