@@ -55,10 +55,15 @@ class ProfileViewSet(viewsets.ModelViewSet):
     # an action when profile/:id/posts is requested
     @action(methods=['get'], detail=True)
     def posts(self, request, pk=None):
-        posts = models.Post.objects.filter(profile_id=pk)
-        serializer = PostSerializer(
-            posts, many=True, context={'request': request})
-        return Response(serializer.data)
+        profile = get_object_or_404(models.Profile, pk=pk)
+        # show posts if profiles is followed or is not private
+        if (request.user.profile in profile.get_followers()) or not profile.is_private:
+            posts = models.Post.objects.filter(profile_id=pk)
+            serializer = PostSerializer(
+                posts, many=True, context={'request': request})
+            return Response(serializer.data)
+        else:
+            return Response({"message": f"You can't see {profile.user.username} posts because is a private account and you don't follow it."}, status=401)
 
     # an action when profile/:id/followers is requested
     @action(methods=['get'], detail=True)
